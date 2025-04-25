@@ -1,22 +1,4 @@
 import type { Locale } from 'date-fns'
-import type {
-  computed,
-  type CSSProperties,
-  defineComponent,
-  h,
-  nextTick,
-  type PropType,
-  provide,
-  ref,
-  SlotsType,
-  toRef,
-  Transition,
-  type VNode,
-  watch,
-  watchEffect,
-  withDirectives
-
-} from 'vue'
 import type { ThemeProps } from '../../_mixins'
 import type { ExtractPublicPropTypes, MaybeArray } from '../../_utils'
 import type { FormValidationStatus } from '../../form/src/interface'
@@ -54,6 +36,23 @@ import { formatInTimeZone } from 'date-fns-tz'
 import { getPreciseEventTarget, happensIn } from 'seemly'
 import { clickoutside } from 'vdirs'
 import { useIsMounted, useKeyboard, useMergedState } from 'vooks'
+import {
+  computed,
+  type CSSProperties,
+  defineComponent,
+  h,
+  nextTick,
+  type PropType,
+  provide,
+  ref,
+  type SlotsType,
+  toRef,
+  Transition,
+  type VNode,
+  watch,
+  watchEffect,
+  withDirectives
+} from 'vue'
 import { type FollowerPlacement, VBinder, VFollower, VTarget } from 'vueuc'
 import { NBaseIcon } from '../../_internal'
 import { TimeIcon } from '../../_internal/icons'
