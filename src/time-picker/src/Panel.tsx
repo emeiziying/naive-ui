@@ -95,7 +95,7 @@ export default defineComponent({
   name: 'TimePickerPanel',
   props: timePickerPanelProps,
   setup(props) {
-    const { mergedThemeRef, mergedClsPrefixRef } = inject(
+    const { mergedThemeRef, mergedClsPrefixRef, timePickerSlots } = inject(
       timePickerInjectionKey
     )!
 
@@ -195,7 +195,8 @@ export default defineComponent({
       hourScrollRef: ref(null),
       minuteScrollRef: ref(null),
       secondScrollRef: ref(null),
-      amPmScrollRef: ref(null)
+      amPmScrollRef: ref(null),
+      timePickerSlots
     }
   },
   render() {
@@ -334,6 +335,11 @@ export default defineComponent({
             </div>
           ) : null}
         </div>
+        {this.timePickerSlots.footer ? (
+          <div class={`${mergedClsPrefix}-time-picker-footer`}>
+            {this.timePickerSlots.footer()}
+          </div>
+        ) : null}
         {this.actions?.length ? (
           <div class={`${mergedClsPrefix}-time-picker-actions`}>
             {this.actions?.includes('clear') ? (

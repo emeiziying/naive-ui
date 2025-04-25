@@ -2,6 +2,7 @@ import type { Ref } from 'vue'
 import type { ScrollbarInst } from '../../_internal'
 import type { MergedTheme } from '../../_mixins'
 import type { TimePickerTheme } from '../styles'
+import type { TimePickerSlots } from './TimePicker'
 import { createInjectionKey } from '../../_utils'
 
 export type ItemValue = number | 'am' | 'pm'
@@ -15,6 +16,7 @@ export interface Item {
 export interface TimePickerInjection {
   mergedThemeRef: Ref<MergedTheme<TimePickerTheme>>
   mergedClsPrefixRef: Ref<string>
+  timePickerSlots: TimePickerSlots
 }
 
 export const timePickerInjectionKey

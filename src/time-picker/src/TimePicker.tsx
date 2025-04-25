@@ -1,4 +1,22 @@
 import type { Locale } from 'date-fns'
+import type {
+  computed,
+  type CSSProperties,
+  defineComponent,
+  h,
+  nextTick,
+  type PropType,
+  provide,
+  ref,
+  SlotsType,
+  toRef,
+  Transition,
+  type VNode,
+  watch,
+  watchEffect,
+  withDirectives
+
+} from 'vue'
 import type { ThemeProps } from '../../_mixins'
 import type { ExtractPublicPropTypes, MaybeArray } from '../../_utils'
 import type { FormValidationStatus } from '../../form/src/interface'
@@ -36,22 +54,6 @@ import { formatInTimeZone } from 'date-fns-tz'
 import { getPreciseEventTarget, happensIn } from 'seemly'
 import { clickoutside } from 'vdirs'
 import { useIsMounted, useKeyboard, useMergedState } from 'vooks'
-import {
-  computed,
-  type CSSProperties,
-  defineComponent,
-  h,
-  nextTick,
-  type PropType,
-  provide,
-  ref,
-  toRef,
-  Transition,
-  type VNode,
-  watch,
-  watchEffect,
-  withDirectives
-} from 'vue'
 import { type FollowerPlacement, VBinder, VFollower, VTarget } from 'vueuc'
 import { NBaseIcon } from '../../_internal'
 import { TimeIcon } from '../../_internal/icons'
@@ -155,6 +157,7 @@ export const timePickerProps = {
     type: Boolean as PropType<boolean | undefined>,
     default: undefined
   },
+  panel: Boolean,
   hours: {
     type: [Number, Array] as PropType<MaybeArray<number>>,
     validator: (value: MaybeArray<number>) => validateUnits(value, 23)
@@ -182,12 +185,14 @@ export type TimePickerProps = ExtractPublicPropTypes<typeof timePickerProps>
 export interface TimePickerSlots {
   default?: () => VNode[]
   icon?: () => VNode[]
+  footer?: () => VNode[]
 }
 
 export default defineComponent({
   name: 'TimePicker',
   props: timePickerProps,
-  setup(props) {
+  slots: Object as SlotsType<TimePickerSlots>,
+  setup(props, { slots }) {
     if (__DEV__) {
       watchEffect(() => {
         if (props.onChange !== undefined) {
@@ -787,7 +792,8 @@ export default defineComponent({
     })
     provide(timePickerInjectionKey, {
       mergedThemeRef: themeRef,
-      mergedClsPrefixRef
+      mergedClsPrefixRef,
+      timePickerSlots: slots
     })
     const exposedMethods: TimePickerInst = {
       focus: () => {
@@ -831,7 +837,9 @@ export default defineComponent({
           itemWidth,
           itemHeight,
           panelActionPadding,
-          itemBorderRadius
+          itemBorderRadius,
+          panelExtraFooterPadding,
+          panelActionDividerColor
         },
         common: { cubicBezierEaseInOut }
       } = themeRef.value
@@ -849,7 +857,11 @@ export default defineComponent({
         '--n-panel-box-shadow': panelBoxShadow,
         '--n-panel-color': panelColor,
         '--n-panel-divider-color': panelDividerColor,
-        '--n-item-border-radius': itemBorderRadius
+        '--n-item-border-radius': itemBorderRadius,
+
+        // panel action
+        '--n-panel-extra-footer-padding': panelExtraFooterPadding,
+        '--n-panel-action-divider-color': panelActionDividerColor
       }
     })
     const themeClassHandle = inlineThemeDisabled
@@ -921,6 +933,51 @@ export default defineComponent({
   },
   render() {
     const { mergedClsPrefix, $slots, triggerOnRender } = this
+    const renderPanel = (): VNode => (
+      <Panel
+        ref="panelInstRef"
+        actions={this.actions}
+        class={this.themeClass}
+        style={this.cssVars as CSSProperties}
+        seconds={this.seconds}
+        minutes={this.minutes}
+        hours={this.hours}
+        transitionDisabled={this.transitionDisabled}
+        hourValue={this.hourValue}
+        showHour={this.hourInFormat}
+        isHourInvalid={this.isHourInvalid}
+        isHourDisabled={this.isHourDisabled}
+        minuteValue={this.minuteValue}
+        showMinute={this.minuteInFormat}
+        isMinuteInvalid={this.isMinuteInvalid}
+        isMinuteDisabled={this.isMinuteDisabled}
+        secondValue={this.secondValue}
+        amPmValue={this.amPmValue}
+        showSecond={this.secondInFormat}
+        isSecondInvalid={this.isSecondInvalid}
+        isSecondDisabled={this.isSecondDisabled}
+        isValueInvalid={this.isValueInvalid}
+        clearText={this.localizedClear}
+        nowText={this.localizedNow}
+        confirmText={this.localizedPositiveText}
+        use12Hours={this.use12Hours}
+        onFocusout={this.handleMenuFocusOut}
+        onKeydown={this.handleMenuKeydown}
+        onHourClick={this.handleHourClick}
+        onMinuteClick={this.handleMinuteClick}
+        onSecondClick={this.handleSecondClick}
+        onAmPmClick={this.handleAmPmClick}
+        onNowClick={this.handleNowClick}
+        onConfirmClick={this.handleConfirmClick}
+        onClearClick={this.clearSelectedValue}
+        onFocusDetectorFocus={this.handleFocusDetectorFocus}
+      >
+        {$slots}
+      </Panel>
+    )
+    if (this.panel) {
+      return renderPanel()
+    }
     triggerOnRender?.()
     return (
       <div
@@ -1000,56 +1057,14 @@ export default defineComponent({
                         default: () => {
                           if (this.mergedShow) {
                             this.onRender?.()
-                            return withDirectives(
-                              <Panel
-                                ref="panelInstRef"
-                                actions={this.actions}
-                                class={this.themeClass}
-                                style={this.cssVars as CSSProperties}
-                                seconds={this.seconds}
-                                minutes={this.minutes}
-                                hours={this.hours}
-                                transitionDisabled={this.transitionDisabled}
-                                hourValue={this.hourValue}
-                                showHour={this.hourInFormat}
-                                isHourInvalid={this.isHourInvalid}
-                                isHourDisabled={this.isHourDisabled}
-                                minuteValue={this.minuteValue}
-                                showMinute={this.minuteInFormat}
-                                isMinuteInvalid={this.isMinuteInvalid}
-                                isMinuteDisabled={this.isMinuteDisabled}
-                                secondValue={this.secondValue}
-                                amPmValue={this.amPmValue}
-                                showSecond={this.secondInFormat}
-                                isSecondInvalid={this.isSecondInvalid}
-                                isSecondDisabled={this.isSecondDisabled}
-                                isValueInvalid={this.isValueInvalid}
-                                clearText={this.localizedClear}
-                                nowText={this.localizedNow}
-                                confirmText={this.localizedPositiveText}
-                                use12Hours={this.use12Hours}
-                                onFocusout={this.handleMenuFocusOut}
-                                onKeydown={this.handleMenuKeydown}
-                                onHourClick={this.handleHourClick}
-                                onMinuteClick={this.handleMinuteClick}
-                                onSecondClick={this.handleSecondClick}
-                                onAmPmClick={this.handleAmPmClick}
-                                onNowClick={this.handleNowClick}
-                                onConfirmClick={this.handleConfirmClick}
-                                onClearClick={this.clearSelectedValue}
-                                onFocusDetectorFocus={
-                                  this.handleFocusDetectorFocus
-                                }
-                              />,
+                            return withDirectives(renderPanel(), [
                               [
-                                [
-                                  clickoutside,
-                                  this.handleClickOutside,
-                                  undefined as unknown as string,
-                                  { capture: true }
-                                ]
+                                clickoutside,
+                                this.handleClickOutside,
+                                undefined as unknown as string,
+                                { capture: true }
                               ]
-                            )
+                            ])
                           }
                           return null
                         }

@@ -14,9 +14,11 @@ format.vue
 actions.vue
 hours12.vue
 formatted.vue
+footerslot.vue
 focus.vue
 status.vue
 timezone.vue
+panel.vue
 ```
 
 ## API

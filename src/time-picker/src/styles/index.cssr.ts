@@ -47,11 +47,16 @@ export default c([
     box-shadow: var(--n-panel-box-shadow);
   `, [
     fadeInScaleUpTransition(),
+    cB('time-picker-footer', `
+      border-top: 1px solid var(--n-panel-action-divider-color);
+      padding: var(--n-panel-extra-footer-padding);
+    `),
     cB('time-picker-actions', `
       padding: var(--n-panel-action-padding);
       align-items: center;
       display: flex;
       justify-content: space-evenly;
+      border-top: 1px solid var(--n-panel-action-divider-color);
     `),
     cB('time-picker-cols', `
       height: calc(var(--n-item-height) * 6);

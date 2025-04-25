@@ -31,7 +31,8 @@ export function self(vars: ThemeCommonVars) {
     itemBorderRadius: borderRadius,
     borderRadius,
     iconColor,
-    iconColorDisabled
+    iconColorDisabled,
+    panelActionDividerColor: dividerColor
   }
 }
 
